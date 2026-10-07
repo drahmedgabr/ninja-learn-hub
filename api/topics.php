@@ -16,8 +16,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($method === 'GET') {
+    $isAdminRead = isset($_GET['admin']) && $_GET['admin'] === '1';
+    if ($isAdminRead) requireAdmin();
+
     if ($id) {
-        $topic = topicWithVideos($id);
+        $topic = topicWithVideos($id, $isAdminRead);
         if (!$topic) respond(['message' => 'Training topic not found.'], 404);
         respond(['data' => $topic]);
     }
@@ -25,7 +28,10 @@ if ($method === 'GET') {
     if ($rows) {
         $ids = array_column($rows, 'id');
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
-        $stmt = db()->prepare("SELECT id, topic_id, title, description, youtube_id, duration, video_order FROM training_videos WHERE topic_id IN ($placeholders) ORDER BY video_order ASC, id ASC");
+        $videoFields = $isAdminRead
+            ? 'id, topic_id, title, description, youtube_id, storage_key, duration, video_order'
+            : 'id, topic_id, title, description, youtube_id, duration, video_order';
+        $stmt = db()->prepare("SELECT $videoFields FROM training_videos WHERE topic_id IN ($placeholders) ORDER BY video_order ASC, id ASC");
         $stmt->execute($ids);
         $grouped = [];
         foreach ($stmt->fetchAll() as $video) $grouped[$video['topic_id']][] = $video;
@@ -42,7 +48,7 @@ if ($method === 'POST') {
     $description = cleanString($data['description'] ?? '', 'description');
     $stmt = db()->prepare('INSERT INTO training_topics (title, description) VALUES (?, ?)');
     $stmt->execute([$title, $description]);
-    respond(['data' => topicWithVideos((int)db()->lastInsertId())], 201);
+    respond(['data' => topicWithVideos((int)db()->lastInsertId(), true)], 201);
 }
 
 if ($method === 'PUT') {
@@ -53,7 +59,7 @@ if ($method === 'PUT') {
     $stmt = db()->prepare('UPDATE training_topics SET title = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
     $stmt->execute([$title, $description, $id]);
     if (!$stmt->rowCount() && !topicWithVideos($id)) respond(['message' => 'Training topic not found.'], 404);
-    respond(['data' => topicWithVideos($id)]);
+    respond(['data' => topicWithVideos($id, true)]);
 }
 
 if ($method === 'DELETE') {

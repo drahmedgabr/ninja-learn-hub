@@ -22,6 +22,7 @@ export const api = {
   createVideo: (topicId, payload) => request("videos.php", { method: "POST", body: JSON.stringify({ ...payload, topic_id: topicId }) }).then(r => r.data),
   updateVideo: (id, payload) => request(`videos.php?id=${id}`, { method: "PUT", body: JSON.stringify(payload) }).then(r => r.data),
   deleteVideo: id => request(`videos.php?id=${id}`, { method: "DELETE" }),
+  videoUrl: id => request(`media.php?id=${encodeURIComponent(id)}`).then(r => r.data?.url),
   auth: () => request("auth.php"),
   login: password => request("auth.php", { method: "POST", body: JSON.stringify({ password }) }),
   logout: () => request("auth.php", { method: "DELETE" }),

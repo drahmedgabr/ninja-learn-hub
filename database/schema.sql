@@ -12,12 +12,14 @@ CREATE TABLE training_videos (
   topic_id INT UNSIGNED NOT NULL,
   title VARCHAR(180) NOT NULL,
   description TEXT NOT NULL,
-  youtube_id VARCHAR(32) NOT NULL,
+  youtube_id VARCHAR(32) NULL,
+  storage_key VARCHAR(500) NULL,
   duration VARCHAR(20) NULL,
   video_order INT UNSIGNED NOT NULL DEFAULT 1,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY idx_videos_topic_order (topic_id, video_order),
+  KEY idx_videos_storage_key (storage_key),
   CONSTRAINT fk_videos_topic FOREIGN KEY (topic_id) REFERENCES training_topics(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -103,3 +103,9 @@
   .playlist-copy strong{font-size:13px}
   .playlist-copy small{font-size:10px}
 }
+
+/* Wasabi protected media */
+.media-player{background:#000}
+.media-player video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
+.field-help{font-size:10px;font-weight:500;color:#8a94a3;line-height:1.5}
+.form-note{margin-top:14px;padding:10px 12px;border-radius:8px;background:#f5f7fa;color:#7b8595;font-size:11px;line-height:1.6}

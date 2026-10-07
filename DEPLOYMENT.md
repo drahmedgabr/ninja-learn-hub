@@ -6,7 +6,7 @@ The frontend now reads training content from PHP + MySQL. No mock data or localS
 
 Use cPanel's Database Wizard / Manage My Databases to create a MySQL or MariaDB database and database user, then give the user access to the database.
 
-Import `database/schema.sql` into that database with phpMyAdmin.
+Import `database/schema.sql` into that database with phpMyAdmin. If the database already exists, run `database/migrations/001_wasabi_video_storage.sql` instead.
 
 ## 2. Configure the PHP API
 
@@ -24,6 +24,12 @@ Then set:
 - DB_USER
 - DB_PASSWORD
 - ADMIN_PASSWORD_HASH
+- WASABI_REGION
+- WASABI_ENDPOINT
+- WASABI_BUCKET
+- WASABI_ACCESS_KEY
+- WASABI_SECRET_KEY
+- WASABI_URL_TTL_SECONDS
 
 Generate the admin password hash on a machine with PHP:
 
@@ -50,7 +56,7 @@ Upload the contents of `dist/` to:
 
 `/apps/tatbeqey/apps/ninja-learn-hub/`
 
-Also upload the repository's `api/` directory and `api/config.php` to the same location.
+Also upload the repository's `api/` directory and `api/config.php` to the same location. Run `composer install --no-dev` in the project root so `vendor/autoload.php` and the AWS SDK are available.
 
 Upload `database/schema.sql` only for setup/reference; it does not need to be public.
 
@@ -60,6 +66,8 @@ The final server layout should include:
 ninja-learn-hub/
   index.html
   assets/
+  vendor/
+  composer.json
   api/
     bootstrap.php
     auth.php
@@ -72,7 +80,7 @@ ninja-learn-hub/
 
 Open:
 
-`index.html#/admin`
+`/apps/tatbeqey/apps/ninja-learn-hub/admin`
 
 Sign in with the password configured in `api/config.php`.
 

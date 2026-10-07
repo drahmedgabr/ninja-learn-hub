@@ -2,7 +2,7 @@
 require __DIR__ . '/bootstrap.php';
 
 function videoById(int $id): ?array {
-    $stmt = db()->prepare('SELECT id, topic_id, title, description, youtube_id, duration, video_order, created_at, updated_at FROM training_videos WHERE id = ?');
+    $stmt = db()->prepare('SELECT id, topic_id, title, description, youtube_id, storage_key, duration, video_order, created_at, updated_at FROM training_videos WHERE id = ?');
     $stmt->execute([$id]);
     return $stmt->fetch() ?: null;
 }
@@ -20,7 +20,9 @@ if ($method === 'POST') {
     if (!$check->fetch()) respond(['message' => 'Training topic not found.'], 404);
     $title = cleanString($data['title'] ?? '', 'title');
     $description = cleanString($data['description'] ?? '', 'description');
-    $youtubeId = cleanString($data['youtube_id'] ?? '', 'YouTube Video ID');
+    $storageKey = trim((string)($data['storage_key'] ?? ''));
+    $youtubeId = trim((string)($data['youtube_id'] ?? ''));
+    if ($storageKey === '' && $youtubeId === '') respond(['message' => 'Wasabi object key is required.'], 422);
     $duration = trim((string)($data['duration'] ?? ''));
     $order = (int)($data['video_order'] ?? 0);
     if ($order < 1) {
@@ -28,8 +30,8 @@ if ($method === 'POST') {
         $next->execute([$topicId]);
         $order = (int)$next->fetchColumn();
     }
-    $stmt = db()->prepare('INSERT INTO training_videos (topic_id, title, description, youtube_id, duration, video_order) VALUES (?, ?, ?, ?, ?, ?)');
-    $stmt->execute([$topicId, $title, $description, $youtubeId, $duration ?: null, $order]);
+    $stmt = db()->prepare('INSERT INTO training_videos (topic_id, title, description, youtube_id, storage_key, duration, video_order) VALUES (?, ?, ?, ?, ?, ?, ?)');
+    $stmt->execute([$topicId, $title, $description, $youtubeId ?: null, $storageKey ?: null, $duration ?: null, $order]);
     respond(['data' => videoById((int)db()->lastInsertId())], 201);
 }
 
@@ -40,11 +42,13 @@ if ($method === 'PUT') {
     $data = jsonInput();
     $title = cleanString($data['title'] ?? '', 'title');
     $description = cleanString($data['description'] ?? '', 'description');
-    $youtubeId = cleanString($data['youtube_id'] ?? '', 'YouTube Video ID');
+    $storageKey = trim((string)($data['storage_key'] ?? ''));
+    $youtubeId = trim((string)($data['youtube_id'] ?? $current['youtube_id'] ?? ''));
+    if ($storageKey === '' && $youtubeId === '') respond(['message' => 'Wasabi object key is required.'], 422);
     $duration = trim((string)($data['duration'] ?? ''));
     $order = (int)($data['video_order'] ?? $current['video_order']);
-    $stmt = db()->prepare('UPDATE training_videos SET title = ?, description = ?, youtube_id = ?, duration = ?, video_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
-    $stmt->execute([$title, $description, $youtubeId, $duration ?: null, max(1, $order), $id]);
+    $stmt = db()->prepare('UPDATE training_videos SET title = ?, description = ?, youtube_id = ?, storage_key = ?, duration = ?, video_order = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+    $stmt->execute([$title, $description, $youtubeId ?: null, $storageKey ?: null, $duration ?: null, max(1, $order), $id]);
     respond(['data' => videoById($id)]);
 }
 
