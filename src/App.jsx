@@ -56,7 +56,7 @@ function Dashboard() {
 
 function YouTubePlayer({ id, title }) {
   if (!id) return <div className="player-placeholder"><div className="player-placeholder-icon"><Play size={23} fill="currentColor" /></div><strong>YouTube video is not configured</strong><span>This lesson needs a YouTube Video ID.</span></div>;
-  return <div className="youtube-frame"><iframe src={`https://www.youtube.com/embed/${encodeURIComponent(id)}?enablejsapi=1&rel=0`} title={title} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowFullScreen /></div>;
+  return <div className="youtube-frame"><iframe src={`https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?enablejsapi=1&rel=0&playsinline=1&iv_load_policy=3`} title={title} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowFullScreen /></div>;
 }
 
 function VideoPage() {

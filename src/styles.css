@@ -80,3 +80,26 @@
   .admin-video-head{padding:12px 15px}
   .modal{padding:18px}
 }
+
+/* Readability: larger training text for comfortable viewing */
+.training-card h3{font-size:22px;line-height:1.35}
+.training-card p{font-size:15px;line-height:1.75}
+.section-heading p,.empty-state p{font-size:14px;line-height:1.75}
+.topic-link{font-size:15px}
+.watch-title-row h1{font-size:32px;line-height:1.25}
+.watch-description{font-size:16px;line-height:1.8}
+.playlist-copy strong{font-size:14px;line-height:1.4}
+.playlist-copy small{font-size:11px}
+.watch-sidebar-header h3{font-size:14px;line-height:1.45}
+.video-nav strong{font-size:12px}
+.admin-topic-header p{font-size:14px;line-height:1.7}
+.admin-video-row strong{font-size:14px}
+.admin-video-row span{font-size:11px}
+@media(max-width:560px){
+  .training-card h3{font-size:20px}
+  .training-card p{font-size:14px}
+  .watch-title-row h1{font-size:26px}
+  .watch-description{font-size:15px}
+  .playlist-copy strong{font-size:13px}
+  .playlist-copy small{font-size:10px}
+}
