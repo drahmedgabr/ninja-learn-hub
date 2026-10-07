@@ -1,17 +1,156 @@
-import {useState} from "react";import{Routes,Route,Link,useLocation,useParams}from"react-router-dom";import{ArrowLeft,ArrowRight,BookOpen,CheckCircle2,Clock3,Compass,LayoutDashboard,Menu,Play,PlayCircle,Search,ShieldCheck,Sparkles,X,Bell,ListVideo}from"lucide-react";import{trainings,getTraining,getVideo,getTrainingStats,formatDuration}from"./data/trainings";
+import { useEffect, useState } from "react";
+import { Routes, Route, Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  ArrowLeft, ArrowRight, BookOpen, CheckCircle2, Compass, LayoutDashboard,
+  Menu, Play, Plus, Pencil, Trash2, ShieldCheck, X, LogOut, Save,
+  Video, FolderPlus, LockKeyhole, RefreshCw
+} from "lucide-react";
+import { api, getApiError } from "./api";
 
-function Logo(){return <Link className="brand" to="/"><span className="brand-mark"><ShieldCheck size={20}/></span><span className="brand-copy"><strong>Ninja Learn</strong><small>Learn • Practice • Perform</small></span></Link>}
-function Progress({value=0,label=false}){return <div className="progress-wrap">{label&&<div className="progress-label"><span>Progress</span><strong>{value}%</strong></div>}<div className="progress-track"><div className="progress-value" style={{width:`${Math.min(100,Math.max(0,value))}%`}}/></div></div>}
-function Sidebar({open,close}){const loc=useLocation();return <><div className={`sidebar-backdrop ${open?"is-open":""}`} onClick={close}/><aside className={`sidebar ${open?"is-open":""}`}><div className="sidebar-top"><Logo/><button className="icon-btn mobile-only" onClick={close}><X size={20}/></button></div><nav className="sidebar-nav"><p className="nav-label">Workspace</p><Link className={`nav-item ${loc.pathname==="/"?"active":""}`} to="/" onClick={close}><LayoutDashboard size={18}/>Home</Link><Link className={`nav-item ${loc.pathname.startsWith("/training")?"active":""}`} to="/" onClick={close}><BookOpen size={18}/>My Training</Link><div className="nav-divider"/><p className="nav-label">Training Topics</p>{trainings.map(t=><Link key={t.id} className={`topic-link ${loc.pathname.includes(t.id)?"active":""}`} to={`/training/${t.id}`} onClick={close}><span className={`topic-dot topic-dot--${t.accent}`}/><span>{t.title}</span></Link>)}</nav><div className="sidebar-footer"><div className="support-card"><BookOpen size={18}/><div><strong>Learning Hub</strong><span>Internal training platform</span></div></div><small>© 2026 Ninja Learn</small></div></aside></>}
-function Topbar({menu}){return <header className="topbar"><button className="icon-btn mobile-only" onClick={menu}><Menu size={22}/></button><div className="topbar-search"><Search size={18}/><span>Search training...</span><kbd>⌘ K</kbd></div><div className="topbar-actions"><button className="icon-btn"><Bell size={19}/><span className="notification-dot"/></button><div className="avatar">AG</div><div className="user-summary"><strong>Training Agent</strong><span>Agent</span></div></div></header>}
-function Layout({children}){const[open,setOpen]=useState(false);return <div className="app-shell"><Sidebar open={open} close={()=>setOpen(false)}/><div className="main-shell"><Topbar menu={()=>setOpen(true)}/><main className="page-content">{children}</main></div></div>}
-function TrainingCard({t}){const s=getTrainingStats(t);return <article className={`training-card training-card--${t.accent}`}><div className="training-card-top"><div className="course-icon"><BookOpen size={22}/></div><span className="badge">{t.category}</span></div><div className="training-card-body"><div className="eyebrow">{t.level} training</div><h3>{t.title}</h3><p>{t.description}</p><div className="course-meta"><span><PlayCircle size={15}/>{t.videos.length} videos</span><span><Clock3 size={15}/>{formatDuration(s.totalSeconds)}</span></div></div><div className="training-card-footer"><div className="mini-progress"><Progress value={s.progress}/><span>{s.progress}%</span></div><Link className="button button--primary button--small" to={`/training/${t.id}`}>View Training <ArrowRight size={15}/></Link></div></article>}
-function Dashboard(){const total=trainings.reduce((n,t)=>n+t.videos.length,0),done=trainings.reduce((n,t)=>n+getTrainingStats(t).completed,0),overall=Math.round(trainings.reduce((n,t)=>n+getTrainingStats(t).progress,0)/trainings.length);return <div className="page-enter"><section className="hero"><div className="hero-copy"><span className="section-kicker"><Sparkles size={14}/> Learning Hub</span><h1>Learn with purpose.<br/><em>Perform with confidence.</em></h1><p>Build the skills that make every customer interaction better. Pick a training topic and continue where you left off.</p><a className="button button--light" href="#training">Explore training <ArrowRight size={17}/></a></div><div className="hero-visual"><div className="hero-orbit hero-orbit--one"/><div className="hero-orbit hero-orbit--two"/><div className="hero-center"><span>NL</span><small>TRAIN</small></div><div className="hero-float hero-float--top"><CheckCircle2 size={17}/>Skills in progress</div><div className="hero-float hero-float--bottom"><PlayCircle size={17}/>Learn at your pace</div></div></section><section className="stats-grid"><Stat icon={<PlayCircle size={19}/>} value={total} label="Total lessons"/><Stat icon={<CheckCircle2 size={19}/>} value={done} label="Completed"/><Stat icon={<Clock3 size={19}/>} value={`${overall}%`} label="Overall progress"/></section><section className="section-block" id="training"><div className="section-heading"><div><span className="section-kicker">Your curriculum</span><h2>Training topics</h2><p>Choose a topic to explore its lessons and continue your development.</p></div><span className="section-count">{trainings.length} topics</span></div><div className="training-grid">{trainings.map(t=><TrainingCard key={t.id} t={t}/>)}</div></section></div>}
-function Stat({icon,value,label}){return <div className="stat-card"><span className="stat-icon">{icon}</span><div><strong>{value}</strong><span>{label}</span></div></div>}
-function CourseHeader({t}){const s=getTrainingStats(t);return <section className="course-header"><Link to="/" className="back-link"><ArrowLeft size={16}/>All training</Link><div className="course-heading"><div><span className="section-kicker">{t.category}</span><h1>{t.title}</h1><p>{t.description}</p></div><div className="course-stat-box"><div className="course-stat-grid"><span><PlayCircle size={17}/><strong>{t.videos.length}</strong> videos</span><span><Clock3 size={17}/><strong>{formatDuration(s.totalSeconds)}</strong></span><span><BookOpen size={17}/><strong>{s.completed}/{t.videos.length}</strong> completed</span></div><Progress value={s.progress} label/></div></div></section>}
-function VideoCard({v,trainingId}){const done=v.progress>=100;return <article className="video-card"><div className="video-thumb"><div className="thumb-pattern"/><span className="video-number">{String(v.number).padStart(2,"0")}</span><div className="thumb-play"><Play size={17} fill="currentColor"/></div><span className="duration">{v.duration}</span></div><div className="video-content"><div className="video-title-row"><div><span className="eyebrow">Video {String(v.number).padStart(2,"0")}</span><h3>{v.title}</h3></div>{done&&<span className="completed-badge"><CheckCircle2 size={15}/>Completed</span>}</div><p>{v.description}</p><div className="video-footer"><div className="video-progress"><Progress value={v.progress}/><span>{v.progress}% watched</span></div><Link className={`button ${done?"button--secondary":"button--primary"} button--small`} to={`/training/${trainingId}/video/${v.id}`}>{done?"Review":v.progress?"Continue":"Watch Video"} <Play size={14} fill="currentColor"/></Link></div></div></article>}
-function TrainingDetail(){const{id}=useParams(),t=getTraining(id);if(!t)return <NotFound/>;return <div className="page-enter"><CourseHeader t={t}/><section className="video-list-section"><div className="list-heading"><div><span className="section-kicker">Course content</span><h2>Lessons</h2></div><span>{t.videos.length} videos</span></div><div className="video-list">{t.videos.map(v=><VideoCard key={v.id} v={v} trainingId={t.id}/>)}</div></section></div>}
-function YouTubePlayer({id,title}){const placeholder=!id||id.startsWith("YOUR_");if(placeholder)return <div className="player-placeholder"><div className="player-placeholder-icon">▶</div><strong>YouTube video placeholder</strong><span>Replace the mock YouTube ID to load “{title}”.</span></div>;return <div className="youtube-frame"><iframe src={`https://www.youtube.com/embed/${id}?enablejsapi=1&rel=0`} title={title} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowFullScreen/></div>}
-function VideoPage(){const{trainingId,videoId}=useParams(),t=getTraining(trainingId),v=getVideo(trainingId,videoId);if(!t||!v)return <NotFound/>;const i=t.videos.findIndex(x=>x.id===v.id),prev=t.videos[i-1],next=t.videos[i+1];return <div className="watch-page page-enter"><div className="watch-top"><Link to={`/training/${t.id}`} className="back-link"><ArrowLeft size={16}/>Back to training</Link><span className="watch-breadcrumb">{t.title}</span></div><div className="watch-layout"><main><YouTubePlayer id={v.youtubeId} title={v.title}/><div className="watch-content"><div className="watch-title-row"><div><span className="section-kicker">Video {String(v.number).padStart(2,"0")} · {t.category}</span><h1>{v.title}</h1></div><span className={`watch-status ${v.progress>=100?"done":""}`}>{v.progress>=100?<><CheckCircle2 size={15}/>Completed</>:<><Clock3 size={15}/>{v.progress}% watched</>}</span></div><p className="watch-description">{v.description}</p><div className="watch-progress"><Progress value={v.progress} label/><small>Mock progress for MVP. Future tracking will calculate actual watched segments.</small></div></div><div className="watch-navigation">{prev?<Link className="video-nav" to={`/training/${t.id}/video/${prev.id}`}><ArrowLeft size={18}/><span><small>Previous</small><strong>{prev.title}</strong></span></Link>:<span/>}{next?<Link className="video-nav video-nav--next" to={`/training/${t.id}/video/${next.id}`}><span><small>Next lesson</small><strong>{next.title}</strong></span><ArrowRight size={18}/></Link>:<Link className="button button--primary" to={`/training/${t.id}`}>Back to course <ListVideo size={16}/></Link>}</div></main><aside className="watch-sidebar"><div className="watch-sidebar-header"><div><span className="section-kicker">Course playlist</span><h3>{t.title}</h3></div><span>{i+1}/{t.videos.length}</span></div><div className="playlist">{t.videos.map(x=><Link key={x.id} className={`playlist-item ${x.id===v.id?"active":""}`} to={`/training/${t.id}/video/${x.id}`}><span className="playlist-number">{String(x.number).padStart(2,"0")}</span><span className="playlist-copy"><strong>{x.title}</strong><small>{x.duration}</small></span>{x.progress>=100&&<CheckCircle2 size={16}/>}</Link>)}</div></aside></div></div>}
-function NotFound(){return <div className="not-found page-enter"><div className="not-found-icon"><Compass size={28}/></div><span className="section-kicker">404</span><h1>We couldn't find that training.</h1><p>The page may have moved or the link may be incorrect.</p><Link className="button button--primary" to="/"><ArrowLeft size={16}/>Back to home</Link></div>}
-export default function App(){return <Layout><Routes><Route path="/" element={<Dashboard/>}/><Route path="/training/:id" element={<TrainingDetail/>}/><Route path="/training/:trainingId/video/:videoId" element={<VideoPage/>}/><Route path="*" element={<NotFound/>}/></Routes></Layout>}
+function Logo() {
+  return <Link className="brand" to="/"><span className="brand-mark"><ShieldCheck size={20} /></span><span className="brand-copy"><strong>Ninja Learn</strong><small>Learn • Practice • Perform</small></span></Link>;
+}
+
+function Sidebar({ open, close }) {
+  const loc = useLocation();
+  const [topics, setTopics] = useState([]);
+  useEffect(() => { api.topics().then(setTopics).catch(() => setTopics([])); }, []);
+  return <>
+    <div className={`sidebar-backdrop ${open ? "is-open" : ""}`} onClick={close} />
+    <aside className={`sidebar ${open ? "is-open" : ""}`}>
+      <div className="sidebar-top"><Logo /><button className="icon-btn mobile-only" onClick={close}><X size={20} /></button></div>
+      <nav className="sidebar-nav">
+        <p className="nav-label">Training Topics</p>
+        {topics.map(t => <Link key={t.id} className={`topic-link ${loc.pathname.includes(String(t.id)) ? "active" : ""}`} to={t.videos?.length ? `/training/${t.id}/video/${t.videos[0].id}` : `/training/${t.id}`} onClick={close}><span className="topic-dot" /><span>{t.title}</span></Link>)}
+        {!topics.length && <span className="sidebar-empty">No training added yet.</span>}
+      </nav>
+      <div className="sidebar-footer">
+        <Link className={`admin-link ${loc.pathname.startsWith("/admin") ? "active" : ""}`} to="/admin" onClick={close}><LayoutDashboard size={17} />Admin Control Panel</Link>
+        <small>© 2026 Ninja Learn</small>
+      </div>
+    </aside>
+  </>;
+}
+
+function Layout({ children }) {
+  const [open, setOpen] = useState(false);
+  return <div className="app-shell"><Sidebar open={open} close={() => setOpen(false)} /><div className="main-shell"><button className="floating-menu mobile-only" onClick={() => setOpen(true)}><Menu size={21} /></button><main className="page-content">{children}</main></div></div>;
+}
+
+function EmptyState({ title = "No training available yet", description = "Training topics will appear here once they are added from the admin control panel." }) {
+  return <div className="empty-state"><div className="empty-icon"><BookOpen size={28} /></div><span className="section-kicker">Learning Hub</span><h2>{title}</h2><p>{description}</p><Link className="button button--primary" to="/admin">Open Control Panel <ArrowRight size={16} /></Link></div>;
+}
+
+function TrainingCard({ topic }) {
+  const firstVideo = topic.videos?.[0];
+  const target = firstVideo ? `/training/${topic.id}/video/${firstVideo.id}` : `/training/${topic.id}`;
+  return <article className="training-card"><div className="training-card-top"><div className="course-icon"><BookOpen size={22} /></div><span className="badge">Training Topic</span></div><div className="training-card-body"><div className="eyebrow">Ninja Learn</div><h3>{topic.title}</h3><p>{topic.description}</p></div><div className="training-card-footer"><Link className="button button--primary button--small" to={target}>View Training <ArrowRight size={15} /></Link></div></article>;
+}
+
+function Dashboard() {
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { api.topics().then(setTopics).catch(() => setTopics([])).finally(() => setLoading(false)); }, []);
+  return <div className="page-enter"><section className="hero hero--compact"><div className="hero-copy"><span className="section-kicker">Learning Hub</span><h1>Learn with purpose.<br /><em>Perform with confidence.</em></h1><p>Choose a training topic and start learning.</p></div></section><section className="section-block" id="training"><div className="section-heading"><div><span className="section-kicker">Your curriculum</span><h2>Training topics</h2><p>Choose a topic to start your training.</p></div></div>{loading ? <div className="loading-state"><RefreshCw className="spin" size={20} />Loading training...</div> : topics.length ? <div className="training-grid">{topics.map(t => <TrainingCard key={t.id} topic={t} />)}</div> : <EmptyState />}</section></div>;
+}
+
+function YouTubePlayer({ id, title }) {
+  if (!id) return <div className="player-placeholder"><div className="player-placeholder-icon"><Play size={23} fill="currentColor" /></div><strong>YouTube video is not configured</strong><span>This lesson needs a YouTube Video ID.</span></div>;
+  return <div className="youtube-frame"><iframe src={`https://www.youtube.com/embed/${encodeURIComponent(id)}?enablejsapi=1&rel=0`} title={title} allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowFullScreen /></div>;
+}
+
+function VideoPage() {
+  const { trainingId, videoId } = useParams();
+  const [topic, setTopic] = useState(null);
+  const [error, setError] = useState("");
+  useEffect(() => { api.topic(trainingId).then(setTopic).catch(e => setError(getApiError(e))); }, [trainingId]);
+  if (error) return <NotFound message={error} />;
+  if (!topic) return <div className="loading-state page-loading"><RefreshCw className="spin" size={20} />Loading lesson...</div>;
+  const videos = topic.videos || [];
+  const video = videos.find(v => String(v.id) === String(videoId));
+  if (!video) return <NotFound />;
+  const index = videos.findIndex(v => String(v.id) === String(videoId));
+  const prev = videos[index - 1], next = videos[index + 1];
+  return <div className="watch-page page-enter">
+    <div className="watch-top"><Link to="/" className="back-link"><ArrowLeft size={17} />Back to training</Link><span className="watch-breadcrumb">{topic.title}</span></div>
+    <div className="watch-layout"><main>
+      <YouTubePlayer id={video.youtube_id} title={video.title} />
+      <div className="watch-content">
+        <div className="watch-title-row"><div><span className="section-kicker">Video {String(video.video_order).padStart(2, "0")} · Training</span><h1>{video.title}</h1></div></div>
+        <p className="watch-description">{video.description}</p>
+      </div>
+      <div className="watch-navigation">
+        {prev ? <Link className="video-nav" to={`/training/${topic.id}/video/${prev.id}`}><ArrowLeft size={19} /><span><small>Previous</small><strong>{prev.title}</strong></span></Link> : <span />}
+        {next ? <Link className="video-nav video-nav--next" to={`/training/${topic.id}/video/${next.id}`}><span><small>Next lesson</small><strong>{next.title}</strong></span><ArrowRight size={19} /></Link> : <Link className="button button--primary" to="/">Back to training <BookOpen size={16} /></Link>}
+      </div>
+    </main><aside className="watch-sidebar"><div className="watch-sidebar-header"><div><span className="section-kicker">Course playlist</span><h3>{topic.title}</h3></div><span>{index + 1}/{videos.length}</span></div><div className="playlist">{videos.map(v => <Link key={v.id} className={`playlist-item ${String(v.id) === String(videoId) ? "active" : ""}`} to={`/training/${topic.id}/video/${v.id}`}><span className="playlist-number">{String(v.video_order).padStart(2, "0")}</span><span className="playlist-copy"><strong>{v.title}</strong>{v.duration && <small>{v.duration}</small>}</span></Link>)}</div></aside></div>
+  </div>;
+}
+
+function TrainingDetail() {
+  const { id } = useParams();
+  const [topic, setTopic] = useState(null);
+  useEffect(() => { api.topic(id).then(setTopic).catch(() => setTopic(null)); }, [id]);
+  if (!topic) return <div className="loading-state"><RefreshCw className="spin" size={20} />Loading training...</div>;
+  if (topic.videos?.length) return <NavigateToVideo topic={topic} />;
+  return <div className="page-enter"><Link to="/" className="back-link"><ArrowLeft size={17} />Back to training</Link><EmptyState title="No videos in this topic yet" description="Add the first video from the admin control panel." /></div>;
+}
+
+function NavigateToVideo({ topic }) {
+  const navigate = useNavigate();
+  useEffect(() => { navigate(`/training/${topic.id}/video/${topic.videos[0].id}`, { replace: true }); }, [navigate, topic]);
+  return <div className="loading-state"><RefreshCw className="spin" size={20} />Opening training...</div>;
+}
+
+function NotFound({ message = "The page may have moved or the link may be incorrect." }) {
+  return <div className="not-found page-enter"><div className="not-found-icon"><Compass size={28} /></div><span className="section-kicker">404</span><h1>We couldn't find that training.</h1><p>{message}</p><Link className="button button--primary" to="/"><ArrowLeft size={16} />Back to home</Link></div>;
+}
+
+function AdminLogin({ onLogin }) {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  async function submit(e) { e.preventDefault(); setError(""); setLoading(true); try { await api.login(password); onLogin(); } catch (err) { setError(getApiError(err)); } finally { setLoading(false); } }
+  return <div className="admin-login page-enter"><div className="admin-login-card"><div className="admin-lock"><LockKeyhole size={25} /></div><span className="section-kicker">Ninja Learn</span><h1>Admin Control Panel</h1><p>Sign in to manage training topics and videos.</p><form onSubmit={submit}><label>Admin password<input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoFocus /></label>{error && <div className="form-error">{error}</div>}<button className="button button--primary button--full" disabled={loading}>{loading ? "Signing in..." : "Sign in"} <ArrowRight size={16} /></button></form></div></div>;
+}
+
+function TopicForm({ initial, onSaved, onCancel }) {
+  const [title, setTitle] = useState(initial?.title || "");
+  const [description, setDescription] = useState(initial?.description || "");
+  const [saving, setSaving] = useState(false);
+  async function submit(e) { e.preventDefault(); setSaving(true); try { const topic = initial ? await api.updateTopic(initial.id, { title, description }) : await api.createTopic({ title, description }); onSaved(topic); } catch (err) { alert(getApiError(err)); } finally { setSaving(false); } }
+  return <form className="admin-form" onSubmit={submit}><div className="form-grid"><label>Topic title<input value={title} onChange={e => setTitle(e.target.value)} required placeholder="e.g. Pharmacy Consultation Excellence" /></label><label>Description<textarea value={description} onChange={e => setDescription(e.target.value)} required rows="4" placeholder="Short description for the training topic" /></label></div><div className="form-actions"><button type="button" className="button button--secondary" onClick={onCancel}>Cancel</button><button className="button button--primary" disabled={saving}><Save size={15} />{saving ? "Saving..." : "Save topic"}</button></div></form>;
+}
+
+function VideoForm({ topicId, initial, onSaved, onCancel }) {
+  const [title, setTitle] = useState(initial?.title || "");
+  const [description, setDescription] = useState(initial?.description || "");
+  const [youtubeId, setYoutubeId] = useState(initial?.youtube_id || "");
+  const [duration, setDuration] = useState(initial?.duration || "");
+  const [order, setOrder] = useState(initial?.video_order || "");
+  const [saving, setSaving] = useState(false);
+  async function submit(e) { e.preventDefault(); setSaving(true); try { const payload = { title, description, youtube_id: youtubeId, duration, video_order: order ? Number(order) : undefined }; const video = initial ? await api.updateVideo(initial.id, payload) : await api.createVideo(topicId, payload); onSaved(video); } catch (err) { alert(getApiError(err)); } finally { setSaving(false); } }
+  return <form className="admin-form" onSubmit={submit}><div className="form-grid"><label>Video title<input value={title} onChange={e => setTitle(e.target.value)} required /></label><label>YouTube Video ID<input value={youtubeId} onChange={e => setYoutubeId(e.target.value)} required placeholder="e.g. dQw4w9WgXcQ" /></label><label>Duration <span className="optional">optional</span><input value={duration} onChange={e => setDuration(e.target.value)} placeholder="e.g. 12:35" /></label><label>Order <span className="optional">optional</span><input type="number" min="1" value={order} onChange={e => setOrder(e.target.value)} placeholder="1" /></label><label className="full-field">Description<textarea value={description} onChange={e => setDescription(e.target.value)} required rows="4" /></label></div><div className="form-actions"><button type="button" className="button button--secondary" onClick={onCancel}>Cancel</button><button className="button button--primary" disabled={saving}><Save size={15} />{saving ? "Saving..." : "Save video"}</button></div></form>;
+}
+
+function AdminPanel() {
+  const [authenticated, setAuthenticated] = useState(null);
+  const [topics, setTopics] = useState([]);
+  const [topicForm, setTopicForm] = useState(null);
+  const [videoForm, setVideoForm] = useState(null);
+  const [openTopic, setOpenTopic] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  async function load() { setLoading(true); try { setTopics(await api.topics(true)); setError(""); } catch (e) { setError(getApiError(e)); } finally { setLoading(false); } }
+  useEffect(() => { api.auth().then(r => setAuthenticated(r.authenticated)).catch(() => setAuthenticated(false)); }, []);
+  useEffect(() => { if (authenticated) load(); }, [authenticated]);
+  if (authenticated === null) return <div className="loading-state page-loading"><RefreshCw className="spin" size={20} />Checking admin access...</div>;
+  if (!authenticated) return <AdminLogin onLogin={() => setAuthenticated(true)} />;
+  async function deleteTopic(id) { if (!confirm("Delete this topic and all of its videos?")) return; try { await api.deleteTopic(id); await load(); } catch (e) { alert(getApiError(e)); } }
+  async function deleteVideo(id) { if (!confirm("Delete this video?")) return; try { await api.deleteVideo(id); await load(); } catch (e) { alert(getApiError(e)); } }
+  return <div className="admin-page page-enter"><div className="admin-header"><div><span className="section-kicker">Management</span><h1>Training Control Panel</h1><p>Add and manage your live training content.</p></div><div className="admin-actions"><button className="button button--secondary" onClick={async () => { await api.logout(); setAuthenticated(false); }}><LogOut size={15} />Sign out</button><button className="button button--primary" onClick={() => setTopicForm({ mode: "create" })}><Plus size={16} />Add topic</button></div></div>{error && <div className="form-error admin-error">{error}</div>}{loading ? <div className="loading-state"><RefreshCw className="spin" size={20} />Loading content...</div> : <div className="admin-topics">{topics.map(topic => <section className="admin-topic" key={topic.id}><div className="admin-topic-header"><div><span className="eyebrow">Training topic</span><h2>{topic.title}</h2><p>{topic.description}</p></div><div className="row-actions"><button className="icon-btn" title="Edit topic" onClick={() => setTopicForm({ mode: "edit", topic })}><Pencil size={17} /></button><button className="icon-btn danger" title="Delete topic" onClick={() => deleteTopic(topic.id)}><Trash2 size={17} /></button></div></div><div className="admin-video-head"><strong><Video size={16} /> Videos</strong><button className="button button--secondary button--small" onClick={() => setVideoForm({ mode: "create", topic })}><Plus size={14} />Add video</button></div>{topic.videos?.length ? <div className="admin-video-list">{topic.videos.map(video => <div className="admin-video-row" key={video.id}><span className="admin-video-number">{String(video.video_order).padStart(2, "0")}</span><div><strong>{video.title}</strong><span>{video.youtube_id}{video.duration ? ` · ${video.duration}` : ""}</span></div><div className="row-actions"><button className="icon-btn" title="Edit video" onClick={() => setVideoForm({ mode: "edit", video, topic })}><Pencil size={16} /></button><button className="icon-btn danger" title="Delete video" onClick={() => deleteVideo(video.id)}><Trash2 size={16} /></button></div></div>)}</div> : <div className="admin-empty">No videos yet. Add the first lesson.</div>}</section>)}{!topics.length && <EmptyState title="Your library is empty" description="Create your first training topic to start building the live curriculum." />}</div>}{topicForm && <div className="modal-backdrop"><div className="modal"><div className="modal-head"><div><span className="section-kicker">{topicForm.mode === "edit" ? "Edit topic" : "New topic"}</span><h2>{topicForm.mode === "edit" ? "Update training topic" : "Create training topic"}</h2></div><button className="icon-btn" onClick={() => setTopicForm(null)}><X size={19} /></button></div><TopicForm initial={topicForm.topic} onCancel={() => setTopicForm(null)} onSaved={() => { setTopicForm(null); load(); }} /></div></div>}{videoForm && <div className="modal-backdrop"><div className="modal"><div className="modal-head"><div><span className="section-kicker">{videoForm.mode === "edit" ? "Edit video" : "New video"}</span><h2>{videoForm.mode === "edit" ? "Update lesson" : `Add lesson to ${videoForm.topic.title}`}</h2></div><button className="icon-btn" onClick={() => setVideoForm(null)}><X size={19} /></button></div><VideoForm topicId={videoForm.topic.id} initial={videoForm.video} onCancel={() => setVideoForm(null)} onSaved={() => { setVideoForm(null); load(); }} /></div></div>}</div>;
+}
+
+export default function App() {
+  return <Layout><Routes><Route path="/" element={<Dashboard />} /><Route path="/training/:id" element={<TrainingDetail />} /><Route path="/training/:trainingId/video/:videoId" element={<VideoPage />} /><Route path="/admin" element={<AdminPanel />} /><Route path="*" element={<NotFound />} /></Routes></Layout>;
+}
