@@ -8,7 +8,20 @@ import {
 import { api, getApiError } from "./api";
 
 function Logo() {
-  return <Link className="brand" to="/"><span className="brand-mark"><ShieldCheck size={20} /></span><span className="brand-copy"><strong>Ninja Learn</strong><small>Learn • Practice • Perform</small></span></Link>;
+  return (
+    <Link className="brand" to="/">
+      <img
+        className="brand-logo"
+        src={`${import.meta.env.BASE_URL}ninja compact logo.png`}
+        alt="Ninja Learn"
+      />
+
+      <span className="brand-copy">
+        <strong>Ninja Learn</strong>
+        <small>Learn • Practice • Perform</small>
+      </span>
+    </Link>
+  );
 }
 
 function Sidebar({ open, close }) {

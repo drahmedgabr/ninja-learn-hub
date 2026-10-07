@@ -175,3 +175,9 @@
   .watch-title-row h1{font-size:30px}
   .watch-description{font-size:17px}
 }
+.brand-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
