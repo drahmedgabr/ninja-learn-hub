@@ -93,7 +93,7 @@ function VideoPage() {
   return <div className="watch-page page-enter">
     <div className="watch-top"><Link to="/" className="back-link"><ArrowLeft size={17} />Back to training</Link><span className="watch-breadcrumb">{topic.title}</span></div>
     <div className="watch-layout"><main>
-      <YouTubePlayer id={video.youtube_id} title={video.title} />
+      <WasabiPlayer video={video} title={video.title} />
       <div className="watch-content">
         <div className="watch-title-row"><div><span className="section-kicker">Video {String(video.video_order).padStart(2, "0")} · Training</span><h1>{video.title}</h1></div></div>
         <p className="watch-description">{video.description}</p>
