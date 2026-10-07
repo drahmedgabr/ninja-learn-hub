@@ -1,12 +1,17 @@
 <?php
 require __DIR__ . '/bootstrap.php';
 
-function topicWithVideos(int $id): ?array {
+function topicWithVideos(int $id, bool $includeStorageKey = false): ?array {
     $stmt = db()->prepare('SELECT id, title, description, created_at, updated_at FROM training_topics WHERE id = ?');
     $stmt->execute([$id]);
     $topic = $stmt->fetch();
     if (!$topic) return null;
-    $videos = db()->prepare('SELECT id, topic_id, title, description, youtube_id, duration, video_order, created_at, updated_at FROM training_videos WHERE topic_id = ? ORDER BY video_order ASC, id ASC');
+
+    $videoFields = $includeStorageKey
+        ? 'id, topic_id, title, description, youtube_id, storage_key, duration, video_order, created_at, updated_at'
+        : 'id, topic_id, title, description, youtube_id, CASE WHEN storage_key IS NOT NULL AND storage_key <> "" THEN 1 ELSE 0 END AS has_wasabi_video, duration, video_order, created_at, updated_at';
+
+    $videos = db()->prepare("SELECT $videoFields FROM training_videos WHERE topic_id = ? ORDER BY video_order ASC, id ASC");
     $videos->execute([$id]);
     $topic['videos'] = $videos->fetchAll();
     return $topic;
@@ -24,6 +29,7 @@ if ($method === 'GET') {
         if (!$topic) respond(['message' => 'Training topic not found.'], 404);
         respond(['data' => $topic]);
     }
+
     $rows = db()->query('SELECT id, title, description, created_at, updated_at FROM training_topics ORDER BY created_at DESC, id DESC')->fetchAll();
     if ($rows) {
         $ids = array_column($rows, 'id');
