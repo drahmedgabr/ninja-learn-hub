@@ -109,3 +109,69 @@
 .media-player video{display:block;width:100%;height:100%;object-fit:contain;background:#000}
 .field-help{font-size:10px;font-weight:500;color:#8a94a3;line-height:1.5}
 .form-note{margin-top:14px;padding:10px 12px;border-radius:8px;background:#f5f7fa;color:#7b8595;font-size:11px;line-height:1.6}
+
+/* Extra large accessibility/readability pass */
+.nav-label,.section-kicker,.eyebrow{font-size:14px}
+.nav-item{font-size:17px;padding:13px 14px}
+.topic-link{font-size:17px;padding:12px 14px}
+.sidebar-footer>small,.support-card span{font-size:12px}
+.support-card strong{font-size:14px}
+.hero p{font-size:18px}
+.button{font-size:16px;min-height:48px}
+.button--small{font-size:14px;min-height:43px}
+.section-heading h2,.list-heading h2{font-size:30px}
+.section-heading p{font-size:16px}
+.section-count,.list-heading>span{font-size:14px}
+.course-meta{font-size:14px}
+.training-card h3{font-size:25px}
+.training-card p{font-size:18px}
+.badge{font-size:12px}
+.progress-label{font-size:13px}
+.mini-progress>span{font-size:12px}
+.course-heading h1{font-size:46px}
+.course-heading p{font-size:17px}
+.course-stat-grid span{font-size:13px}
+.course-stat-grid strong{font-size:14px}
+.video-content h3{font-size:20px}
+.video-content p{font-size:15px}
+.completed-badge,.watch-status{font-size:13px}
+.video-progress>span{font-size:12px}
+.duration{font-size:12px}
+.back-link{font-size:14px}
+.watch-breadcrumb{font-size:13px}
+.watch-title-row h1{font-size:38px}
+.watch-description{font-size:19px}
+.watch-progress small{font-size:12px}
+.playlist-copy strong{font-size:16px}
+.playlist-copy small{font-size:12px}
+.watch-sidebar-header h3{font-size:16px}
+.watch-sidebar-header>span{font-size:12px}
+.video-nav small{font-size:11px}
+.video-nav strong{font-size:14px}
+.empty-state h2{font-size:28px}
+.empty-state p{font-size:16px}
+.admin-header h1{font-size:36px}
+.admin-header p{font-size:16px}
+.admin-topic-header h2{font-size:23px}
+.admin-topic-header p{font-size:16px}
+.admin-video-head strong{font-size:14px}
+.admin-video-row strong{font-size:16px}
+.admin-video-row span{font-size:13px}
+.admin-empty{font-size:14px}
+.form-grid label,.admin-login-card label{font-size:13px}
+.form-grid input,.form-grid textarea,.admin-login-card input{font-size:15px;padding:13px}
+.form-note{font-size:13px}
+@media(max-width:560px){
+  .nav-item,.topic-link{font-size:16px}
+  .hero p{font-size:16px}
+  .button{font-size:15px}
+  .section-heading h2,.list-heading h2{font-size:26px}
+  .training-card h3{font-size:23px}
+  .training-card p{font-size:16px}
+  .course-heading h1{font-size:36px}
+  .course-heading p{font-size:16px}
+  .video-content h3{font-size:19px}
+  .video-content p{font-size:14px}
+  .watch-title-row h1{font-size:30px}
+  .watch-description{font-size:17px}
+}
