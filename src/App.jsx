@@ -56,12 +56,12 @@ function Dashboard() {
 
 function WasabiPlayer({ video, title }) {
   const [url, setUrl] = useState(null);
-  const [loading, setLoading] = useState(Boolean(video.storage_key));
+  const [loading, setLoading] = useState(Boolean(video.has_wasabi_video));
   const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    if (!video.storage_key) { setLoading(false); return; }
+    if (!video.has_wasabi_video) { setLoading(false); return; }
     setLoading(true);
     setError("");
     api.videoUrl(video.id)
@@ -69,7 +69,7 @@ function WasabiPlayer({ video, title }) {
       .catch(err => { if (!cancelled) setError(getApiError(err)); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [video.id, video.storage_key]);
+  }, [video.id, video.has_wasabi_video]);
 
   if (loading) return <div className="player-placeholder"><RefreshCw className="spin" size={24} /><strong>Preparing secure video...</strong><span>The protected training video is being prepared.</span></div>;
   if (url) return <div className="youtube-frame media-player"><video src={url} controls playsInline preload="metadata" controlsList="nodownload" onContextMenu={e => e.preventDefault()} aria-label={title} /></div>;

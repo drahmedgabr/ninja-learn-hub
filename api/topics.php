@@ -30,7 +30,7 @@ if ($method === 'GET') {
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $videoFields = $isAdminRead
             ? 'id, topic_id, title, description, youtube_id, storage_key, duration, video_order'
-            : 'id, topic_id, title, description, youtube_id, duration, video_order';
+            : 'id, topic_id, title, description, youtube_id, CASE WHEN storage_key IS NOT NULL AND storage_key <> "" THEN 1 ELSE 0 END AS has_wasabi_video, duration, video_order';
         $stmt = db()->prepare("SELECT $videoFields FROM training_videos WHERE topic_id IN ($placeholders) ORDER BY video_order ASC, id ASC");
         $stmt->execute($ids);
         $grouped = [];
